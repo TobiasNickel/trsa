@@ -1,0 +1,29 @@
+{
+  "name": "trsa",
+  "version": "0.0.1",
+  "description": "node-forge rsa with an API that you understand",
+  "main": "rsa.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TobiasNickel/trsa.git"
+  },
+  "keywords": [
+    "rsa",
+    "sign",
+    "verify",
+    "encrypt",
+    "decrypt"
+  ],
+  "author": "Tobias Nickel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TobiasNickel/trsa/issues"
+  },
+  "homepage": "https://github.com/TobiasNickel/trsa#readme",
+  "dependencies": {
+    "node-forge": "^0.7.1"
+  }
+}
