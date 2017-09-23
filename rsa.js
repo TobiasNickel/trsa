@@ -32,8 +32,15 @@ function generateKeyPair(options) {
 }
 
 
-const generateKeyPairSync = rsa.generateKeyPair;
-
+const generateKeyPairSync = function(options){
+    if (!options) options = {};
+    if (!options.bits) options.bits = 2048; // 4096;
+    if (!options.workers) options.workers = 2;
+    var {privateKey, publicKey} = rsa.generateKeyPair(options);
+    privateKey = forge.pki.privateKeyToPem(privateKey);
+    publicKey = forge.pki.publicKeyToPem(publicKey);
+    return {privateKey, publicKey};
+}
 function sign(data, privateKey) {
     const md = forge.md.sha1.create();
     privateKey = forge.pki.privateKeyFromPem(privateKey);

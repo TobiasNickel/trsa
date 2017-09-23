@@ -1,6 +1,6 @@
 {
   "name": "trsa",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "node-forge rsa with an API that you understand",
   "main": "rsa.js",
   "scripts": {
