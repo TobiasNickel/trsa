@@ -9,6 +9,23 @@ var forge = require('node-forge');
 
 var rsa = forge.pki.rsa;
 
+/**
+ * @typedef KeyPair 
+ * @property {string} publicKey 
+ * @property {string} privateKey 
+ **/
+
+/**
+ * @typedef GenerateOptions 
+ * @property {number} [bits] default 2048
+ * @property {number} [workers] default 2 
+ **/
+
+/**
+ * 
+ * @param {GenerateOptions} [options]
+ * @return {Promise<KeyPair>}
+ */
 function generateKeyPair(options) {
     if (!options) options = {};
     return new Promise((resolve, reject) => {
@@ -22,16 +39,20 @@ function generateKeyPair(options) {
                 return;
             }
             // keypair.privateKey, keypair.publicKey 
-            privateKey = forge.pki.privateKeyToPem(privateKey);
-            publicKey = forge.pki.publicKeyToPem(publicKey);
+            const privateKeyPem = forge.pki.privateKeyToPem(privateKey);
+            const publicKeyPem = forge.pki.publicKeyToPem(publicKey);
             // forge.pki.privateKeyFromPem(forge.pki.privateKeyToPem(m.keypair.privateKey));
             // forge.pki.publicKeyFromPem(forge.pki.publicKeyToPem(m.keypair.publicKey))
-            resolve({ privateKey, publicKey });
+            resolve({ privateKey: privateKeyPem, publicKey: publicKeyPem });
         });
     });
 }
 
-
+/**
+ * 
+ * @param {GenerateOptions} [options]
+ * @return {KeyPair} 
+ */
 const generateKeyPairSync = function(options) {
     if (!options) options = {};
     if (!options.bits) options.bits = 2048; // 4096;
@@ -42,6 +63,12 @@ const generateKeyPairSync = function(options) {
     return { privateKey, publicKey };
 }
 
+/**
+ * 
+ * @param {string} data 
+ * @param {string} privateKey 
+ * @return {string}
+ */
 function sign(data, privateKey) {
     const md = forge.md.sha1.create();
     privateKey = forge.pki.privateKeyFromPem(privateKey);
@@ -50,6 +77,13 @@ function sign(data, privateKey) {
     return signature; //JSON.stringify(signature) //new Buffer(signature).toString('base64');
 }
 
+/**
+ * 
+ * @param {string} data 
+ * @param {string} signature 
+ * @param {string} publicKey 
+ * @return {boolean}
+ */
 function verify(data, signature, publicKey) {
     //signature = JSON.parse(signature) //new Buffer(signature, 'base64').toString('ascii')
     publicKey = forge.pki.publicKeyFromPem(publicKey);
@@ -65,11 +99,23 @@ function verify(data, signature, publicKey) {
     }
 }
 
+/**
+ * 
+ * @param {string} data 
+ * @param {string} publicKey 
+ * @return {string}
+ */
 function encrypt(data, publicKey) {
     publicKey = forge.pki.publicKeyFromPem(publicKey);
     return publicKey.encrypt(data);
 }
 
+/**
+ * 
+ * @param {string} data 
+ * @param {string} privateKey 
+ * @return {string}
+ */
 function decrypt(data, privateKey) {
     privateKey = forge.pki.privateKeyFromPem(privateKey);
     return privateKey.decrypt(data);
