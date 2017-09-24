@@ -24858,15 +24858,16 @@ function generateKeyPair(options) {
 }
 
 
-const generateKeyPairSync = function(options){
+const generateKeyPairSync = function(options) {
     if (!options) options = {};
     if (!options.bits) options.bits = 2048; // 4096;
     if (!options.workers) options.workers = 2;
-    var {privateKey, publicKey} = rsa.generateKeyPair(options);
+    var { privateKey, publicKey } = rsa.generateKeyPair(options);
     privateKey = forge.pki.privateKeyToPem(privateKey);
     publicKey = forge.pki.publicKeyToPem(publicKey);
-    return {privateKey, publicKey};
+    return { privateKey, publicKey };
 }
+
 function sign(data, privateKey) {
     const md = forge.md.sha1.create();
     privateKey = forge.pki.privateKeyFromPem(privateKey);
@@ -24881,7 +24882,13 @@ function verify(data, signature, publicKey) {
     const md = forge.md.sha1.create();
     md.update(data, 'utf8');
     const bytes = md.digest().bytes()
-    return publicKey.verify(bytes, signature);
+    try {
+        return publicKey.verify(bytes, signature);
+    } catch (err) {
+        // wrong signatures are not considered a error
+        // it is one possible outcome of a verification process
+        return false;
+    }
 }
 
 function encrypt(data, publicKey) {
@@ -24902,7 +24909,6 @@ module.exports = {
     encrypt,
     decrypt,
 };
-
 
 /***/ }),
 /* 36 */
