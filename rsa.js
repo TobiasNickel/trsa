@@ -71,7 +71,7 @@ const generateKeyPairSync = function(options) {
  */
 function sign(data, privateKey) {
     const md = forge.md.sha1.create();
-    privateKey = forge.pki.privateKeyFromPem(privateKey);
+    privateKey = typeof privateKey === 'string' ? forge.pki.privateKeyFromPem(privateKey) : privateKey;
     md.update(data, 'utf8');
     const signature = privateKey.sign(md);
     return signature; //JSON.stringify(signature) //new Buffer(signature).toString('base64');
@@ -86,7 +86,7 @@ function sign(data, privateKey) {
  */
 function verify(data, signature, publicKey) {
     //signature = JSON.parse(signature) //new Buffer(signature, 'base64').toString('ascii')
-    publicKey = forge.pki.publicKeyFromPem(publicKey);
+    publicKey = typeof publicKey === 'string' ? forge.pki.publicKeyFromPem(publicKey) : publicKey;
     const md = forge.md.sha1.create();
     md.update(data, 'utf8');
     const bytes = md.digest().bytes()
@@ -117,7 +117,7 @@ function encrypt(data, publicKey) {
  * @return {string}
  */
 function decrypt(data, privateKey) {
-    privateKey = forge.pki.privateKeyFromPem(privateKey);
+    privateKey = typeof privateKey === 'string' ? forge.pki.privateKeyFromPem(privateKey) : privateKey;
     return privateKey.decrypt(data);
 }
 
