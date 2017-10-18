@@ -69,12 +69,13 @@ const generateKeyPairSync = function(options) {
  * @param {string} privateKey 
  * @return {string}
  */
-function sign(data, privateKey) {
+function sign(data, _privateKey) {
     const md = forge.md.sha1.create();
-    privateKey = typeof privateKey === 'string' ? forge.pki.privateKeyFromPem(privateKey) : privateKey;
-    md.update(data, 'utf8');
+    const privateKey = typeof _privateKey === 'string' ? forge.pki.privateKeyFromPem(_privateKey) : _privateKey;
+    md.update(data, 'hex');
     const signature = privateKey.sign(md);
-    return signature; //JSON.stringify(signature) //new Buffer(signature).toString('base64');
+
+    return signatureToHex(signature); //JSON.stringify(signature) //new Buffer(signature).toString('base64');
 }
 
 /**
@@ -93,9 +94,13 @@ function verify(data, signature, publicKey) {
     try {
         return publicKey.verify(bytes, signature);
     } catch (err) {
-        // wrong signatures are not considered a error
-        // it is one possible outcome of a verification process
-        return false;
+        try {
+            return publicKey.verify(bytes, hexToSignature(signature));
+        } catch (err) {
+            // wrong signatures are not considered a error
+            // it is one possible outcome of a verification process
+            return false;
+        }
     }
 }
 
@@ -128,4 +133,19 @@ module.exports = {
     verify,
     encrypt,
     decrypt,
+};
+
+function signatureToHex(signature) {
+    return signature.split('').map(c => {
+        const code = c.charCodeAt(0);
+        return (code < 16 ? '0' : '') + code.toString(16)
+    }).join('');
+}
+
+function hexToSignature(hex) {
+    var tuples = [];
+    for (var i = 0; i < hex.length; i += 2) {
+        tuples.push(hex[i] + hex[i + 1]);
+    }
+    return tuples.map(t => String.fromCharCode(parseInt(t, 16))).join('');
 };
