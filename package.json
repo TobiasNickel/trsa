@@ -1,11 +1,11 @@
 {
     "name": "trsa",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "node-forge rsa with an API that you understand",
     "main": "rsa.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "webpack --entry=./rsa.js --output-filename=build.js"
+        "build": "webpack --entry=./rsa.js --output-filename=trsaweb.js --output-library=trsa"
     },
     "repository": {
         "type": "git",
@@ -25,6 +25,6 @@
     },
     "homepage": "https://github.com/TobiasNickel/trsa#readme",
     "dependencies": {
-        "node-forge": "^0.7.1"
+        "node-rsa": "^0.4.2"
     }
 }

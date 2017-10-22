@@ -5,9 +5,7 @@
  * - keys, signatures and encrypted data should be represented stringifyable data not as complex objects
  */
 
-var forge = require('node-forge');
-
-var rsa = forge.pki.rsa;
+var NodeRSA = require('node-rsa');
 
 /**
  * @typedef KeyPair 
@@ -30,21 +28,16 @@ function generateKeyPair(options) {
     if (!options) options = {};
     return new Promise((resolve, reject) => {
         if (!options.bits) options.bits = 2048; // 4096;
-        if (!options.workers) options.workers = 2;
+        var key = new NodeRSA({ b: options.bits });
 
-        // options is like: { bits: 2048, workers: 2 }
-        rsa.generateKeyPair(options, function(err, { privateKey, publicKey }) {
-            if (err) {
-                reject(err);
-                return;
-            }
-            // keypair.privateKey, keypair.publicKey 
-            const privateKeyPem = forge.pki.privateKeyToPem(privateKey);
-            const publicKeyPem = forge.pki.publicKeyToPem(publicKey);
-            // forge.pki.privateKeyFromPem(forge.pki.privateKeyToPem(m.keypair.privateKey));
-            // forge.pki.publicKeyFromPem(forge.pki.publicKeyToPem(m.keypair.publicKey))
-            resolve({ privateKey: privateKeyPem, publicKey: publicKeyPem });
-        });
+
+        // keypair.privateKey, keypair.publicKey 
+        const privateKeyPem = key.exportKey("private");
+        const publicKeyPem = key.exportKey("public");
+        // forge.pki.privateKeyFromPem(forge.pki.privateKeyToPem(m.keypair.privateKey));
+        // forge.pki.publicKeyFromPem(forge.pki.publicKeyToPem(m.keypair.publicKey))
+        resolve({ privateKey: privateKeyPem, publicKey: publicKeyPem });
+        return key;
     });
 }
 
@@ -56,11 +49,15 @@ function generateKeyPair(options) {
 const generateKeyPairSync = function(options) {
     if (!options) options = {};
     if (!options.bits) options.bits = 2048; // 4096;
-    if (!options.workers) options.workers = 2;
-    var { privateKey, publicKey } = rsa.generateKeyPair(options);
-    privateKey = forge.pki.privateKeyToPem(privateKey);
-    publicKey = forge.pki.publicKeyToPem(publicKey);
-    return { privateKey, publicKey };
+    var key = new NodeRSA({ b: options.bits });
+
+
+    // keypair.privateKey, keypair.publicKey 
+    const privateKeyPem = key.exportKey("private");
+    const publicKeyPem = key.exportKey("public");
+    // forge.pki.privateKeyFromPem(forge.pki.privateKeyToPem(m.keypair.privateKey));
+    // forge.pki.publicKeyFromPem(forge.pki.publicKeyToPem(m.keypair.publicKey))
+    return { privateKey: privateKeyPem, publicKey: publicKeyPem };
 }
 
 /**
@@ -69,13 +66,9 @@ const generateKeyPairSync = function(options) {
  * @param {string} privateKey 
  * @return {string}
  */
-function sign(data, _privateKey) {
-    const md = forge.md.sha1.create();
-    const privateKey = typeof _privateKey === 'string' ? forge.pki.privateKeyFromPem(_privateKey) : _privateKey;
-    md.update(data, 'hex');
-    const signature = privateKey.sign(md);
-
-    return signatureToHex(signature); //JSON.stringify(signature) //new Buffer(signature).toString('base64');
+function sign(data, privateKey) {
+    var key = new NodeRSA(privateKey, "private");
+    return key.sign(data, 'hex');
 }
 
 /**
@@ -86,22 +79,9 @@ function sign(data, _privateKey) {
  * @return {boolean}
  */
 function verify(data, signature, publicKey) {
-    //signature = JSON.parse(signature) //new Buffer(signature, 'base64').toString('ascii')
-    publicKey = typeof publicKey === 'string' ? forge.pki.publicKeyFromPem(publicKey) : publicKey;
-    const md = forge.md.sha1.create();
-    md.update(data, 'utf8');
-    const bytes = md.digest().bytes()
-    try {
-        return publicKey.verify(bytes, signature);
-    } catch (err) {
-        try {
-            return publicKey.verify(bytes, hexToSignature(signature));
-        } catch (err) {
-            // wrong signatures are not considered a error
-            // it is one possible outcome of a verification process
-            return false;
-        }
-    }
+    //console.log({ data, signature, publicKey })
+    var key = new NodeRSA(publicKey, "public");
+    return key.verify(data, signature, undefined, 'hex');
 }
 
 /**
@@ -111,8 +91,9 @@ function verify(data, signature, publicKey) {
  * @return {string}
  */
 function encrypt(data, publicKey) {
-    publicKey = forge.pki.publicKeyFromPem(publicKey);
-    return publicKey.encrypt(data);
+    var key = new NodeRSA(publicKey, "public");
+    //console.log('key.isPrivate();', key.isPrivate())
+    return key.encrypt(data, "buffer").toString('hex');
 }
 
 /**
@@ -122,8 +103,8 @@ function encrypt(data, publicKey) {
  * @return {string}
  */
 function decrypt(data, privateKey) {
-    privateKey = typeof privateKey === 'string' ? forge.pki.privateKeyFromPem(privateKey) : privateKey;
-    return privateKey.decrypt(data);
+    var key = new NodeRSA(privateKey, "private");
+    return key.decrypt(Buffer.from(data, 'hex')).toString();
 }
 
 module.exports = {
@@ -133,6 +114,7 @@ module.exports = {
     verify,
     encrypt,
     decrypt,
+    sha256,
 };
 
 function signatureToHex(signature) {
@@ -143,9 +125,15 @@ function signatureToHex(signature) {
 }
 
 function hexToSignature(hex) {
-    var tuples = [];
+    const tuples = [];
     for (var i = 0; i < hex.length; i += 2) {
         tuples.push(hex[i] + hex[i + 1]);
     }
     return tuples.map(t => String.fromCharCode(parseInt(t, 16))).join('');
 };
+
+function sha256(data) {
+    const md = forge.md.sha256.create();
+    md.update(data);
+    return md.digest().toHex();
+}
