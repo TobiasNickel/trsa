@@ -1,6 +1,6 @@
 {
     "name": "trsa",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "node-forge rsa with an API that you understand",
     "main": "rsa.js",
     "scripts": {
@@ -25,6 +25,6 @@
     },
     "homepage": "https://github.com/TobiasNickel/trsa#readme",
     "dependencies": {
-        "node-rsa": "^0.4.2"
+        "node-rsa": "^1.0.1"
     }
 }
