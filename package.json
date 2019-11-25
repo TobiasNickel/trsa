@@ -25,6 +25,6 @@
     },
     "homepage": "https://github.com/TobiasNickel/trsa#readme",
     "dependencies": {
-        "node-rsa": "^1.0.1"
+        "node-rsa": "^1.0.6"
     }
 }
