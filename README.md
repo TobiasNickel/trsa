@@ -31,3 +31,55 @@ fs.writeKeySync('./keyFile.json', JSON.stringify(keypair));
 
 ```
 
+# GOLANG
+For golang you simple import `github.com/tobiasnickel/trsa/golang/trsa` or run the following command for installation:
+```sh
+go get github.com/tobiasnickel/trsa/golang/trsa
+```
+and then you can 
+```go
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+
+	"github.com/tobiasnickel/trsa/golang/trsa"
+)
+
+func main() {
+	publicKey, privateKey, err := trsa.GenerateKeys(2048)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	golangMessage := []byte("Hallo Javascript from Golang !!!")
+    
+	encryptedMessage, err := trsa.Encrypt(golangMessage, publicKey)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+    decryptedMessage, err := trsa.Decrypt(encryptedMessage, privateKey) 
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("decrypted message:", string(decryptedMessage));
+	signature, err := trsa.Sign(golangMessage, privateKey)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = trsa.Verify(golangMessage, signature, publicKey);
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("done")
+
+}
+```
+
