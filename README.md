@@ -36,7 +36,7 @@ For golang you simple import `github.com/tobiasnickel/trsa/golang/trsa` or run t
 ```sh
 go get github.com/tobiasnickel/trsa/golang/trsa
 ```
-and then you can 
+and then you can do the same as before:
 ```go
 package main
 
@@ -79,7 +79,6 @@ func main() {
 		return
 	}
 	fmt.Println("done")
-
 }
 ```
 
