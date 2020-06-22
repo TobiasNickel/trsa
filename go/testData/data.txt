@@ -1,0 +1,9 @@
+This weekend I made great progress for building secure independent apps. With t-secure-express I provide a module, to have RSA encrypted communication between a js web client and your express application.
+
+Both client and server are using my trsa library, that is based on node-forge. So it is easy, for both sites to create their crypto material. Also, the for the server side provided middleware can get applied to any new or existing app. To enable secure RSA encrypted communication, without the need for bothersome and for some part expensive and deployment delaying https certificates. Using this tech, you can establish secure connections on your timeline.
+
+Also, it is transporting information on plain http. that is an advantage for the transmission, does not get slow down or cut in some countries.
+
+A great use case can specially found, as the keys can be perfectly used for authentication. If you can share keys face to face, there will be nothing to break into your communications. This technology, can be perfect, for plain message exchange like chat, or more integrated transactions, up to the use in distributed applications and blockchain.
+
+The usage is documented in the modules README on npm. It is really easy, try it out.

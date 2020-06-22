@@ -1,11 +1,11 @@
 {
     "name": "trsa",
-    "version": "0.0.8",
+    "version": "1.0.0",
     "description": "node-forge rsa with an API that you understand",
     "main": "rsa.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "webpack --entry=./rsa.js --output-filename=trsaweb.js --output-library=trsa"
+        "build": "webpack --entry=./rsa.js --output-filename=trsaweb.js --mode=development --devtool=none --output-library=trsa"
     },
     "repository": {
         "type": "git",

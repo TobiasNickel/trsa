@@ -1,0 +1,11 @@
+const fs = require('fs');
+const rsa = require('trsa');
+const keypair = rsa.generateKeyPair();
+const dir = './testData';
+fs.writeFileSync(`${dir}/privateKey`, keypair.privateKey);
+fs.writeFileSync(`${dir}/publicKey`, keypair.publicKey);
+const data = fs.readFileSync(`${dir}/data.txt`).toString();
+const encryptedMessage = rsa.encrypt(data, keypair.publicKey);
+fs.writeFileSync(`${dir}/data.txt.encrypted`, Buffer.from(encryptedMessage, 'hex'));
+const signature = rsa.sign(data, keypair.privateKey);
+fs.writeFileSync(`${dir}/data.txt.signature`, signature);
